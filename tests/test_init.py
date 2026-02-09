@@ -177,6 +177,7 @@ async def test_available_entities_all_features() -> None:
     }
     grocy_data = _make_grocy_data(all_features)
     result = await _async_get_available_entities(grocy_data)
+    result_without_object = [elem for elem in result if not elem.startswith("object_")]
 
     expected = {
         ATTR_STOCK,
@@ -193,61 +194,67 @@ async def test_available_entities_all_features() -> None:
         ATTR_BATTERIES,
         ATTR_OVERDUE_BATTERIES,
     }
-    assert set(result) == expected
+    assert set(result_without_object) == expected
 
 
 @pytest.mark.asyncio
 async def test_available_entities_stock_only() -> None:
     grocy_data = _make_grocy_data({"FEATURE_FLAG_STOCK"})
     result = await _async_get_available_entities(grocy_data)
+    result_without_object = [elem for elem in result if not elem.startswith("object_")]
 
-    assert ATTR_STOCK in result
-    assert ATTR_MISSING_PRODUCTS in result
-    assert ATTR_EXPIRED_PRODUCTS in result
-    assert ATTR_EXPIRING_PRODUCTS in result
-    assert ATTR_OVERDUE_PRODUCTS in result
-    assert ATTR_TASKS not in result
-    assert ATTR_CHORES not in result
+    assert ATTR_STOCK in result_without_object
+    assert ATTR_MISSING_PRODUCTS in result_without_object
+    assert ATTR_EXPIRED_PRODUCTS in result_without_object
+    assert ATTR_EXPIRING_PRODUCTS in result_without_object
+    assert ATTR_OVERDUE_PRODUCTS in result_without_object
+    assert ATTR_TASKS not in result_without_object
+    assert ATTR_CHORES not in result_without_object
 
 
 @pytest.mark.asyncio
 async def test_available_entities_tasks_only() -> None:
     grocy_data = _make_grocy_data({"FEATURE_FLAG_TASKS"})
     result = await _async_get_available_entities(grocy_data)
+    result_without_object = [elem for elem in result if not elem.startswith("object_")]
 
-    assert set(result) == {ATTR_TASKS, ATTR_OVERDUE_TASKS}
+    assert set(result_without_object) == {ATTR_TASKS, ATTR_OVERDUE_TASKS}
 
 
 @pytest.mark.asyncio
 async def test_available_entities_chores_only() -> None:
     grocy_data = _make_grocy_data({"FEATURE_FLAG_CHORES"})
     result = await _async_get_available_entities(grocy_data)
+    result_without_object = [elem for elem in result if not elem.startswith("object_")]
 
-    assert set(result) == {ATTR_CHORES, ATTR_OVERDUE_CHORES}
+    assert set(result_without_object) == {ATTR_CHORES, ATTR_OVERDUE_CHORES}
 
 
 @pytest.mark.asyncio
 async def test_available_entities_shopping_list_only() -> None:
     grocy_data = _make_grocy_data({"FEATURE_FLAG_SHOPPINGLIST"})
     result = await _async_get_available_entities(grocy_data)
+    result_without_object = [elem for elem in result if not elem.startswith("object_")]
 
-    assert result == [ATTR_SHOPPING_LIST]
+    assert result_without_object == [ATTR_SHOPPING_LIST]
 
 
 @pytest.mark.asyncio
 async def test_available_entities_recipes_only() -> None:
     grocy_data = _make_grocy_data({"FEATURE_FLAG_RECIPES"})
     result = await _async_get_available_entities(grocy_data)
+    result_without_object = [elem for elem in result if not elem.startswith("object_")]
 
-    assert result == [ATTR_MEAL_PLAN]
+    assert result_without_object == [ATTR_MEAL_PLAN]
 
 
 @pytest.mark.asyncio
 async def test_available_entities_batteries_only() -> None:
     grocy_data = _make_grocy_data({"FEATURE_FLAG_BATTERIES"})
     result = await _async_get_available_entities(grocy_data)
+    result_without_object = [elem for elem in result if not elem.startswith("object_")]
 
-    assert set(result) == {ATTR_BATTERIES, ATTR_OVERDUE_BATTERIES}
+    assert set(result_without_object) == {ATTR_BATTERIES, ATTR_OVERDUE_BATTERIES}
 
 
 @pytest.mark.asyncio
@@ -255,7 +262,8 @@ async def test_available_entities_no_features() -> None:
     grocy_data = _make_grocy_data(set())
     result = await _async_get_available_entities(grocy_data)
 
-    assert result == []
+    result_without_object = [elem for elem in result if not elem.startswith("object_")]
+    assert result_without_object == []
 
 
 @pytest.mark.asyncio
@@ -264,7 +272,8 @@ async def test_available_entities_none_config() -> None:
     grocy_data.async_get_config = AsyncMock(return_value=None)
     result = await _async_get_available_entities(grocy_data)
 
-    assert result == []
+    result_without_object = [elem for elem in result if not elem.startswith("object_")]
+    assert result_without_object == []
 
 
 @pytest.mark.asyncio

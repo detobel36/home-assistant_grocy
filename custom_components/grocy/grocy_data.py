@@ -14,6 +14,8 @@ from homeassistant.helpers.http import HomeAssistantView
 from grocy import Grocy
 from grocy.data_models.battery import Battery
 from grocy.data_models.chore import Chore
+from grocy.data_models.generic import EntityType
+from grocy.grocy_api_client import CurrentStockResponse
 
 from .const import (
     ATTR_BATTERIES,
@@ -65,6 +67,10 @@ class GrocyData:
         """Update data."""
         if entity_key in self.entity_update_method:
             return await self.entity_update_method[entity_key]()
+        if entity_key.startswith("object_"):
+            return await self.async_update_generic_object(
+                entity_key.removeprefix("object_")
+            )
 
     async def async_update_stock(self):
         """Update stock data."""
@@ -188,6 +194,14 @@ class GrocyData:
         def wrapper():
             filter_query = [f"next_estimated_charge_time<{datetime.now()}"]
             return self.api.batteries.list(filter_query, get_details=True)
+
+        return await self.hass.async_add_executor_job(wrapper)
+
+    async def async_update_generic_object(self, object_key: str) -> list:
+        """Update generic object."""
+
+        def wrapper():
+            return self.api.generic.list(EntityType[object_key.upper()])
 
         return await self.hass.async_add_executor_job(wrapper)
 

@@ -45,11 +45,21 @@ class GrocyCoordinatorData:
     shopping_list: list[ShoppingListProduct] | None = None
     stock: list[Product] | None = None
     tasks: list[Task] | None = None
+    objects: dict[str, list] | None = None
 
     def __setitem__(self, key, value):
-        setattr(self, key, value)
+        if key.startswith("object_"):
+            if self.objects is None:
+                self.objects = {}
+            self.objects[key] = value
+        else:
+            setattr(self, key, value)
 
     def __getitem__(self, key: str):
+        if key.startswith("object_"):
+            if self.objects is not None:
+                return self.objects.get(key, None)
+            return None
         return getattr(self, key)
 
 
