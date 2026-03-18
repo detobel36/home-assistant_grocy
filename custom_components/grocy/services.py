@@ -40,6 +40,7 @@ SERVICE_COMPLETE_TASK = "complete_task"
 SERVICE_ADD_GENERIC = "add_generic"
 SERVICE_UPDATE_GENERIC = "update_generic"
 SERVICE_DELETE_GENERIC = "delete_generic"
+SERVICE_GET_GENERIC = "get_generic"
 SERVICE_CONSUME_RECIPE = "consume_recipe"
 SERVICE_TRACK_BATTERY = "track_battery"
 SERVICE_ADD_MISSING_PRODUCTS_TO_SHOPPING_LIST = "add_missing_products_to_shopping_list"
@@ -106,6 +107,14 @@ SERVICE_ADD_GENERIC_SCHEMA = vol.All(
     )
 )
 
+SERVICE_GET_GENERIC_SCHEMA = vol.All(
+    vol.Schema(
+        {
+            vol.Required(SERVICE_ENTITY_TYPE): str,
+        }
+    )
+)
+
 SERVICE_UPDATE_GENERIC_SCHEMA = vol.All(
     vol.Schema(
         {
@@ -168,6 +177,7 @@ SERVICES_WITH_ACCOMPANYING_SCHEMA: list[tuple[str, vol.Schema]] = [
     (SERVICE_EXECUTE_CHORE, SERVICE_EXECUTE_CHORE_SCHEMA),
     (SERVICE_COMPLETE_TASK, SERVICE_COMPLETE_TASK_SCHEMA),
     (SERVICE_ADD_GENERIC, SERVICE_ADD_GENERIC_SCHEMA),
+    (SERVICE_GET_GENERIC, SERVICE_GET_GENERIC_SCHEMA),
     (SERVICE_UPDATE_GENERIC, SERVICE_UPDATE_GENERIC_SCHEMA),
     (SERVICE_DELETE_GENERIC, SERVICE_DELETE_GENERIC_SCHEMA),
     (SERVICE_CONSUME_RECIPE, SERVICE_CONSUME_RECIPE_SCHEMA),
@@ -215,6 +225,9 @@ async def async_setup_services(
 
         elif service == SERVICE_ADD_GENERIC:
             await async_add_generic_service(hass, coordinator, service_data)
+
+        elif service == SERVICE_GET_GENERIC:
+            await async_get_generic_service(hass, coordinator, service_data)
 
         elif service == SERVICE_UPDATE_GENERIC:
             await async_update_generic_service(hass, coordinator, service_data)
@@ -362,6 +375,22 @@ async def async_add_generic_service(
 
     await hass.async_add_executor_job(wrapper)
     await _post_generic_refresh(coordinator, entity_type)
+
+
+async def async_get_generic_service(
+    hass: HomeAssistant, coordinator: GrocyDataUpdateCoordinator, data
+):
+    """Get a generic entity in Grocy."""
+    entity_type_raw = data.get(SERVICE_ENTITY_TYPE, None)
+    entity_type = EntityType.TASKS
+
+    if entity_type_raw is not None:
+        entity_type = EntityType(entity_type_raw)
+
+    def wrapper():
+        return coordinator.grocy_api.generic.list(entity_type)
+
+    return await hass.async_add_executor_job(wrapper)
 
 
 async def async_update_generic_service(

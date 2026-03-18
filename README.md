@@ -137,18 +137,21 @@ The calendar syncs automatically at the interval configured during setup (defaul
 
 The following services are available. For all options, check [Developer Tools: Services](https://my.home-assistant.io/redirect/developer_services/) in Home Assistant.
 
-| Service | Description |
-|---|---|
-| `grocy.add_generic` | Add a single object of a given entity type |
-| `grocy.add_product_to_stock` | Add a given amount of a product to stock |
-| `grocy.open_product` | Open a given amount of a product in stock |
-| `grocy.track_battery` | Track a battery |
-| `grocy.complete_task` | Complete a task |
-| `grocy.consume_product_from_stock` | Consume a given amount of a product from stock |
-| `grocy.execute_chore` | Execute a chore (with optional timestamp and executor) |
-| `grocy.consume_recipe` | Consume a recipe |
-| `grocy.add_missing_products_to_shopping_list` | Add currently missing products to a shopping list |
-| `grocy.remove_product_in_shopping_list` | Remove a product from a shopping list |
+| Service                                       | Description                                            |
+| --------------------------------------------- | ------------------------------------------------------ |
+| `grocy.add_generic`                           | Add a single object of a given entity type             |
+| `grocy.get_generic`                           | Get an object list of a given entity type              |
+| `grocy.update_generic`                        | Update a single object of a given entity type          |
+| `grocy.delete_generic`                        | Delete a single object of a given entity type          |
+| `grocy.add_product_to_stock`                  | Add a given amount of a product to stock               |
+| `grocy.open_product`                          | Open a given amount of a product in stock              |
+| `grocy.track_battery`                         | Track a battery                                        |
+| `grocy.complete_task`                         | Complete a task                                        |
+| `grocy.consume_product_from_stock`            | Consume a given amount of a product from stock         |
+| `grocy.execute_chore`                         | Execute a chore (with optional timestamp and executor) |
+| `grocy.consume_recipe`                        | Consume a recipe                                       |
+| `grocy.add_missing_products_to_shopping_list` | Add currently missing products to a shopping list      |
+| `grocy.remove_product_in_shopping_list`       | Remove a product from a shopping list                  |
 
 ### Feature Reference
 

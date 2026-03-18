@@ -513,6 +513,14 @@ Create a new entity of any type.
 
 After creation, the corresponding sensor is refreshed (for tasks and chores).
 
+#### `grocy.get_generic`
+
+Get a list of entities of any type.
+
+| Parameter     | Type   | Required | Description                                       |
+| ------------- | ------ | -------- | ------------------------------------------------- |
+| `entity_type` | string | Yes      | Entity type: `tasks`, `chores`, `batteries`, etc. |
+
 #### `grocy.update_generic`
 
 Update an existing entity.
