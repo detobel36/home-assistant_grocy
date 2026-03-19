@@ -39,7 +39,7 @@ from custom_components.grocy.const import (
 
 
 @patch(
-    "custom_components.grocy.async_setup_endpoint_for_image_proxy",
+    "custom_components.grocy.async_setup_endpoints",
     new_callable=AsyncMock,
 )
 @patch(
@@ -81,7 +81,7 @@ async def test_async_setup_entry_initializes_integration(
 
 
 @patch(
-    "custom_components.grocy.async_setup_endpoint_for_image_proxy",
+    "custom_components.grocy.async_setup_endpoints",
     new_callable=AsyncMock,
 )
 @patch(
@@ -283,7 +283,7 @@ async def test_async_setup_entry_raises_not_ready_on_timeout(
             new_callable=AsyncMock,
         ),
         patch(
-            "custom_components.grocy.async_setup_endpoint_for_image_proxy",
+            "custom_components.grocy.async_setup_endpoints",
             new_callable=AsyncMock,
         ),
     ):
@@ -312,7 +312,7 @@ async def test_async_setup_entry_raises_not_ready_on_os_error(
             new_callable=AsyncMock,
         ),
         patch(
-            "custom_components.grocy.async_setup_endpoint_for_image_proxy",
+            "custom_components.grocy.async_setup_endpoints",
             new_callable=AsyncMock,
         ),
     ):

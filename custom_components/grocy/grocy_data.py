@@ -220,10 +220,8 @@ class GrocyData:
         return await self.hass.async_add_executor_job(wrapper)
 
 
-async def async_setup_endpoint_for_image_proxy(
-    hass: HomeAssistant, config_entry: ConfigEntry
-):
-    """Do setup and register the image api for grocy images with HA."""
+async def async_setup_endpoints(hass: HomeAssistant, config_entry: ConfigEntry):
+    """Do setup and register the apis for grocy with HA."""
     session = async_get_clientsession(hass)
 
     url = config_entry.get(CONF_URL) or ""
@@ -235,8 +233,44 @@ async def async_setup_endpoint_for_image_proxy(
     else:
         grocy_full_url = f"{grocy_base_url}:{port_number}"
 
-    _LOGGER.debug("Generated image api url to grocy: '%s'", grocy_full_url)
+    _LOGGER.debug("Generated api url to grocy: '%s'", grocy_full_url)
     hass.http.register_view(GrocyPictureView(session, grocy_full_url, api_key))
+    hass.http.register_view(GrocyObjectsView(session, grocy_full_url, api_key))
+
+
+class GrocyObjectsView(HomeAssistantView):
+    """View to proxy generic objects from grocy."""
+
+    requires_auth = True
+    url = "/api/grocy/objects/{entity}"
+    name = "api:grocy:objects"
+
+    def __init__(self, session, base_url, api_key) -> None:
+        self._session = session
+        self._base_url = base_url
+        self._api_key = api_key
+
+    async def get(self, request, entity: str) -> web.Response:
+        """GET request for the generic objects."""
+        url = f"{self._base_url}/api/objects/{entity}"
+        headers = {"GROCY-API-KEY": self._api_key, "accept": "application/json"}
+
+        async with self._session.get(url, headers=headers) as resp:
+            resp.raise_for_status()
+
+            response_headers = {}
+            for name, value in resp.headers.items():
+                if name in (
+                    hdrs.CACHE_CONTROL,
+                    hdrs.CONTENT_DISPOSITION,
+                    hdrs.CONTENT_LENGTH,
+                    hdrs.CONTENT_TYPE,
+                    hdrs.CONTENT_ENCODING,
+                ):
+                    response_headers[name] = value
+
+            body = await resp.read()
+            return web.Response(body=body, headers=response_headers)
 
 
 class GrocyPictureView(HomeAssistantView):

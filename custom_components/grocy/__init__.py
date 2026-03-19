@@ -34,7 +34,7 @@ from .const import (
     STARTUP_MESSAGE,
 )
 from .coordinator import GrocyDataUpdateCoordinator
-from .grocy_data import GrocyData, async_setup_endpoint_for_image_proxy
+from .grocy_data import GrocyData, async_setup_endpoints
 from .services import async_setup_services, async_unload_services
 
 __all__ = ["async_migrate_entry"]
@@ -69,7 +69,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry):
 
     await hass.config_entries.async_forward_entry_setups(config_entry, PLATFORMS)
     await async_setup_services(hass, config_entry)
-    await async_setup_endpoint_for_image_proxy(hass, config_entry.data)
+    await async_setup_endpoints(hass, config_entry.data)
 
     return True
 

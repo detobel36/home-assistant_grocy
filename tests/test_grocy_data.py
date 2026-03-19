@@ -34,8 +34,9 @@ from custom_components.grocy.const import (
 )
 from custom_components.grocy.grocy_data import (
     GrocyData,
+    GrocyObjectsView,
     GrocyPictureView,
-    async_setup_endpoint_for_image_proxy,
+    async_setup_endpoints,
 )
 from tests.factories import (
     DummyBattery,
@@ -390,7 +391,7 @@ async def test_async_get_config_due_soon_days_handles_invalid_value(
     assert grocy_data.due_soon_days is None
 
 
-# ─── async_setup_endpoint_for_image_proxy ─────────────────────────────────────
+# ─── async_setup_endpoints ────────────────────────────────────────────────────
 
 
 @pytest.mark.feature("image_proxy")
@@ -408,11 +409,12 @@ async def test_async_setup_endpoint_registers_view(hass) -> None:
         "custom_components.grocy.grocy_data.async_get_clientsession"
     ) as mock_session:
         mock_session.return_value = MagicMock()
-        await async_setup_endpoint_for_image_proxy(hass, config_data)
+        await async_setup_endpoints(hass, config_data)
 
-    hass.http.register_view.assert_called_once()
-    view = hass.http.register_view.call_args[0][0]
-    assert isinstance(view, GrocyPictureView)
+    assert hass.http.register_view.call_count == 2
+    views = [call[0][0] for call in hass.http.register_view.call_args_list]
+    assert any(isinstance(view, GrocyPictureView) for view in views)
+    assert any(isinstance(view, GrocyObjectsView) for view in views)
 
 
 @pytest.mark.feature("image_proxy")
@@ -430,10 +432,11 @@ async def test_async_setup_endpoint_with_path(hass) -> None:
         "custom_components.grocy.grocy_data.async_get_clientsession"
     ) as mock_session:
         mock_session.return_value = MagicMock()
-        await async_setup_endpoint_for_image_proxy(hass, config_data)
+        await async_setup_endpoints(hass, config_data)
 
-    view = hass.http.register_view.call_args[0][0]
-    assert "grocy" in view._base_url
+    views = [call[0][0] for call in hass.http.register_view.call_args_list]
+    for view in views:
+        assert "grocy" in view._base_url
 
 
 # ─── GrocyPictureView ────────────────────────────────────────────────────────
@@ -516,6 +519,58 @@ def test_picture_view_url_pattern() -> None:
     """Verify URL pattern contains expected placeholders."""
     assert "{picture_type}" in GrocyPictureView.url
     assert "{filename}" in GrocyPictureView.url
+
+
+# ─── GrocyObjectsView ────────────────────────────────────────────────────────
+
+
+@pytest.mark.feature("api_proxy")
+@pytest.mark.asyncio
+async def test_objects_view_get_proxies_request() -> None:
+    """Verify objects proxying with correct headers."""
+    mock_session = MagicMock()
+    response_body = b'[{"id": 1, "name": "Test Object"}]'
+    mock_resp = MagicMock()
+    mock_resp.headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.CONTENT_LENGTH: str(len(response_body)),
+    }
+    mock_resp.read = AsyncMock(return_value=response_body)
+    mock_resp.raise_for_status = MagicMock()
+
+    mock_context = MagicMock()
+    mock_context.__aenter__ = AsyncMock(return_value=mock_resp)
+    mock_context.__aexit__ = AsyncMock(return_value=False)
+    mock_session.get.return_value = mock_context
+
+    view = GrocyObjectsView(mock_session, "https://grocy.local:9192", "api-key-123")
+
+    request = MagicMock()
+
+    response = await view.get(request, "locations")
+
+    mock_session.get.assert_called_once()
+    call_url = mock_session.get.call_args[0][0]
+    assert "/api/objects/locations" in call_url
+
+    call_headers = mock_session.get.call_args[1]["headers"]
+    assert call_headers["GROCY-API-KEY"] == "api-key-123"
+    assert call_headers["accept"] == "application/json"
+
+    assert response.body == response_body
+    assert response.headers[hdrs.CONTENT_TYPE] == "application/json"
+
+
+@pytest.mark.feature("api_proxy")
+def test_objects_view_requires_auth() -> None:
+    """Verify authentication required."""
+    assert GrocyObjectsView.requires_auth is True
+
+
+@pytest.mark.feature("api_proxy")
+def test_objects_view_url_pattern() -> None:
+    """Verify URL pattern contains expected placeholders."""
+    assert "{entity}" in GrocyObjectsView.url
 
 
 # ─── All entity keys are mapped ──────────────────────────────────────────────
