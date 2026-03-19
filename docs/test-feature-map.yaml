@@ -232,6 +232,16 @@ features:
           - test_picture_view_requires_no_auth
           - test_picture_view_url_pattern
 
+  api_proxy:
+    name: Generic Objects API Proxy
+    doc_section: "#11-generic-objects-api-proxy"
+    tests:
+      - file: tests/test_grocy_data.py
+        functions:
+          - test_objects_view_get_proxies_request
+          - test_objects_view_requires_auth
+          - test_objects_view_url_pattern
+
   generic_crud:
     name: Generic CRUD
     doc_section: "#9-generic-crud"

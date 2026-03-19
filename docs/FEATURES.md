@@ -20,6 +20,7 @@ If you enable a todo entity (like `todo.grocy_stock`), you should also enable th
 8. [Image Proxy](#8-image-proxy)
 9. [Generic CRUD](#9-generic-crud)
 10. [Configuration & Setup](#10-configuration-setup)
+11. [Generic Objects API Proxy](#11-generic-objects-api-proxy)
 
 ---
 
@@ -609,6 +610,27 @@ All entities (except calendar) are updated every 30 seconds via the data coordin
 | tests/test_init.py | `test_available_entities_none_config` | None config returns empty list |
 | tests/test_coordinator.py | `test_async_update_data_skips_disabled_entities` | Disabled entities are not updated |
 | tests/test_coordinator.py | `test_async_update_data_raises_update_failed_when_all_fail` | Errors propagated as UpdateFailed |
+
+---
+
+## 11. Generic Objects API Proxy
+
+Proxies requests for any list of generic Grocy objects through Home Assistant. This allows custom cards to fetch data directly via Home Assistant.
+
+### HTTP Endpoint
+
+`/api/grocy/objects/{entity}`
+
+- `entity`: Any Grocy entity type (e.g., `locations`, `quantity_units`, `product_groups`)
+- Authentication required (Home Assistant user)
+
+### Test Coverage
+
+| Test File | Test Function | What It Validates |
+|-----------|---------------|-------------------|
+| tests/test_grocy_data.py | `test_objects_view_get_proxies_request` | Objects proxying with correct headers |
+| tests/test_grocy_data.py | `test_objects_view_requires_auth` | Authentication required |
+| tests/test_grocy_data.py | `test_objects_view_url_pattern` | URL pattern contains expected placeholders |
 
 ---
 
