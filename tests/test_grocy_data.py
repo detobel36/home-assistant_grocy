@@ -50,6 +50,8 @@ from tests.factories import (
 
 @pytest.fixture
 def grocy_data(hass, mock_grocy) -> GrocyData:
+    """Fixture to provide a GrocyData instance with a mocked executor."""
+
     async def immediate_executor(func, *args):
         return func(*args)
 
@@ -398,6 +400,7 @@ async def test_async_get_config_due_soon_days_handles_invalid_value(
 @pytest.mark.asyncio
 async def test_async_setup_endpoint_registers_view(hass) -> None:
     """Verify endpoint registration."""
+    """Verify endpoint registration."""
     config_data = {
         CONF_URL: "https://demo.grocy.info",
         CONF_API_KEY: "test-key",
@@ -420,6 +423,7 @@ async def test_async_setup_endpoint_registers_view(hass) -> None:
 @pytest.mark.feature("image_proxy")
 @pytest.mark.asyncio
 async def test_async_setup_endpoint_with_path(hass) -> None:
+    """Verify URL path handling for subpath installations."""
     """Verify URL path handling for subpath installations."""
     config_data = {
         CONF_URL: "https://demo.grocy.info/grocy",

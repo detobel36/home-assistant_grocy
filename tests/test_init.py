@@ -59,6 +59,7 @@ async def test_async_setup_entry_initializes_integration(
     hass,
     mock_config_entry,
 ) -> None:
+    """Test full setup flow: coordinator, services, proxy, platforms."""
     coordinator = MagicMock()
     coordinator.grocy_data = MagicMock()
     coordinator.async_config_entry_first_refresh = AsyncMock()
@@ -102,6 +103,7 @@ async def test_async_setup_entry_raises_not_ready(
     hass,
     mock_config_entry,
 ) -> None:
+    """Test connection failure raises ConfigEntryNotReady."""
     coordinator = MagicMock()
     coordinator.grocy_data = MagicMock()
     coordinator.async_config_entry_first_refresh = AsyncMock()
@@ -124,7 +126,8 @@ async def test_async_setup_entry_raises_not_ready(
 async def test_async_unload_entry_cleans_up(
     mock_unload_services, hass, mock_config_entry
 ) -> None:
-    hass.data[DOMAIN] = coordinator = MagicMock()
+    """Test unload cleans up data and services."""
+    hass.data[DOMAIN] = MagicMock()
     hass.config_entries.async_unload_platforms = AsyncMock(return_value=True)
 
     result = await async_unload_entry(hass, mock_config_entry)
@@ -144,6 +147,7 @@ async def test_async_unload_entry_cleans_up(
 async def test_async_unload_entry_platform_failure(
     mock_unload_services, hass, mock_config_entry
 ) -> None:
+    """Test partial cleanup on platform failure."""
     hass.data[DOMAIN] = MagicMock()
     hass.config_entries.async_unload_platforms = AsyncMock(return_value=False)
 
@@ -167,6 +171,7 @@ def _make_grocy_data(features: set[str]):
 
 @pytest.mark.asyncio
 async def test_available_entities_all_features() -> None:
+    """Test all features enabled creates all entities."""
     all_features = {
         "FEATURE_FLAG_STOCK",
         "FEATURE_FLAG_SHOPPINGLIST",
@@ -198,6 +203,7 @@ async def test_available_entities_all_features() -> None:
 
 @pytest.mark.asyncio
 async def test_available_entities_stock_only() -> None:
+    """Test stock-only creates stock entities."""
     grocy_data = _make_grocy_data({"FEATURE_FLAG_STOCK"})
     result = await _async_get_available_entities(grocy_data)
 
@@ -212,6 +218,7 @@ async def test_available_entities_stock_only() -> None:
 
 @pytest.mark.asyncio
 async def test_available_entities_tasks_only() -> None:
+    """Test tasks-only creates task entities."""
     grocy_data = _make_grocy_data({"FEATURE_FLAG_TASKS"})
     result = await _async_get_available_entities(grocy_data)
 
@@ -220,6 +227,7 @@ async def test_available_entities_tasks_only() -> None:
 
 @pytest.mark.asyncio
 async def test_available_entities_chores_only() -> None:
+    """Test chores-only creates chore entities."""
     grocy_data = _make_grocy_data({"FEATURE_FLAG_CHORES"})
     result = await _async_get_available_entities(grocy_data)
 
@@ -228,6 +236,7 @@ async def test_available_entities_chores_only() -> None:
 
 @pytest.mark.asyncio
 async def test_available_entities_shopping_list_only() -> None:
+    """Test shopping-list-only creates shopping entities."""
     grocy_data = _make_grocy_data({"FEATURE_FLAG_SHOPPINGLIST"})
     result = await _async_get_available_entities(grocy_data)
 
@@ -236,6 +245,7 @@ async def test_available_entities_shopping_list_only() -> None:
 
 @pytest.mark.asyncio
 async def test_available_entities_recipes_only() -> None:
+    """Test recipes-only creates meal plan entities."""
     grocy_data = _make_grocy_data({"FEATURE_FLAG_RECIPES"})
     result = await _async_get_available_entities(grocy_data)
 
@@ -244,6 +254,7 @@ async def test_available_entities_recipes_only() -> None:
 
 @pytest.mark.asyncio
 async def test_available_entities_batteries_only() -> None:
+    """Test batteries-only creates battery entities."""
     grocy_data = _make_grocy_data({"FEATURE_FLAG_BATTERIES"})
     result = await _async_get_available_entities(grocy_data)
 
@@ -252,6 +263,7 @@ async def test_available_entities_batteries_only() -> None:
 
 @pytest.mark.asyncio
 async def test_available_entities_no_features() -> None:
+    """Test no features creates no entities."""
     grocy_data = _make_grocy_data(set())
     result = await _async_get_available_entities(grocy_data)
 
@@ -260,6 +272,7 @@ async def test_available_entities_no_features() -> None:
 
 @pytest.mark.asyncio
 async def test_available_entities_none_config() -> None:
+    """Test none config returns empty list."""
     grocy_data = MagicMock()
     grocy_data.async_get_config = AsyncMock(return_value=None)
     result = await _async_get_available_entities(grocy_data)
@@ -271,6 +284,7 @@ async def test_available_entities_none_config() -> None:
 async def test_async_setup_entry_raises_not_ready_on_timeout(
     hass, mock_config_entry
 ) -> None:
+    """Test timeout raises ConfigEntryNotReady."""
     with (
         patch("custom_components.grocy.GrocyDataUpdateCoordinator") as mock_cls,
         patch(
@@ -300,6 +314,7 @@ async def test_async_setup_entry_raises_not_ready_on_timeout(
 async def test_async_setup_entry_raises_not_ready_on_os_error(
     hass, mock_config_entry
 ) -> None:
+    """Test OS error raises ConfigEntryNotReady."""
     with (
         patch("custom_components.grocy.GrocyDataUpdateCoordinator") as mock_cls,
         patch(

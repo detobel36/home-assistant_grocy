@@ -6,7 +6,6 @@ import logging
 from datetime import datetime, timedelta
 
 from aiohttp import hdrs, web
-from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.http import HomeAssistantView
