@@ -220,14 +220,14 @@ class GrocyData:
         return await self.hass.async_add_executor_job(wrapper)
 
 
-async def async_setup_endpoints(hass: HomeAssistant, config_entry: ConfigEntry):
+async def async_setup_endpoints(hass: HomeAssistant, config_data: dict):
     """Do setup and register the apis for grocy with HA."""
     session = async_get_clientsession(hass)
 
-    url = config_entry.get(CONF_URL) or ""
+    url = config_data.get(CONF_URL) or ""
     (grocy_base_url, grocy_path) = extract_base_url_and_path(url)
-    api_key = config_entry.get(CONF_API_KEY)
-    port_number = config_entry.get(CONF_PORT)
+    api_key = config_data.get(CONF_API_KEY)
+    port_number = config_data.get(CONF_PORT)
     if grocy_path:
         grocy_full_url = f"{grocy_base_url}:{port_number}/{grocy_path}"
     else:
@@ -259,14 +259,15 @@ class GrocyObjectsView(HomeAssistantView):
             resp.raise_for_status()
 
             response_headers = {}
+            relevant_headers = (
+                hdrs.CACHE_CONTROL,
+                hdrs.CONTENT_DISPOSITION,
+                hdrs.CONTENT_LENGTH,
+                hdrs.CONTENT_TYPE,
+                hdrs.CONTENT_ENCODING,
+            )
             for name, value in resp.headers.items():
-                if name in (
-                    hdrs.CACHE_CONTROL,
-                    hdrs.CONTENT_DISPOSITION,
-                    hdrs.CONTENT_LENGTH,
-                    hdrs.CONTENT_TYPE,
-                    hdrs.CONTENT_ENCODING,
-                ):
+                if any(name.lower() == h.lower() for h in relevant_headers):
                     response_headers[name] = value
 
             body = await resp.read()
@@ -296,14 +297,15 @@ class GrocyPictureView(HomeAssistantView):
             resp.raise_for_status()
 
             response_headers = {}
+            relevant_headers = (
+                hdrs.CACHE_CONTROL,
+                hdrs.CONTENT_DISPOSITION,
+                hdrs.CONTENT_LENGTH,
+                hdrs.CONTENT_TYPE,
+                hdrs.CONTENT_ENCODING,
+            )
             for name, value in resp.headers.items():
-                if name in (
-                    hdrs.CACHE_CONTROL,
-                    hdrs.CONTENT_DISPOSITION,
-                    hdrs.CONTENT_LENGTH,
-                    hdrs.CONTENT_TYPE,
-                    hdrs.CONTENT_ENCODING,
-                ):
+                if any(name.lower() == h.lower() for h in relevant_headers):
                     response_headers[name] = value
 
             body = await resp.read()
