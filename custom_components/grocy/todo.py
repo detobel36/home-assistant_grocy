@@ -255,16 +255,16 @@ class GrocyTodoListEntity(GrocyEntity, TodoListEntity):
         )
         if description.key in [ATTR_BATTERIES, ATTR_CHORES, ATTR_TASKS]:
             self._attr_supported_features |= TodoListEntityFeature.CREATE_TODO_ITEM
-        if description.key in []:  # noqa: RUF060
-            self._attr_supported_features |= (
-                TodoListEntityFeature.SET_DESCRIPTION_ON_ITEM
-            )
-        if description.key in []:  # noqa: RUF060
-            self._attr_supported_features |= TodoListEntityFeature.SET_DUE_DATE_ON_ITEM
-        if description.key in []:  # noqa: RUF060
-            self._attr_supported_features |= (
-                TodoListEntityFeature.SET_DUE_DATETIME_ON_ITEM
-            )
+
+        # The following features are placeholders for future implementation
+        # when supported by the underlying Grocy API or integration logic.
+        # if description.key in ["_placeholder_"]:
+        #     self._attr_supported_features |= TodoListEntityFeature.SET_DESCRIPTION_ON_ITEM
+        # if description.key in ["_placeholder_"]:
+        #     self._attr_supported_features |= TodoListEntityFeature.SET_DUE_DATE_ON_ITEM
+        # if description.key in ["_placeholder_"]:
+        #     self._attr_supported_features |= TodoListEntityFeature.SET_DUE_DATETIME_ON_ITEM
+
         super().__init__(coordinator, description, config_entry)
 
     def _get_grocy_item(self, item_id: str):
