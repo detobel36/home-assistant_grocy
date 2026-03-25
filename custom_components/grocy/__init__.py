@@ -69,7 +69,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry):
 
     await hass.config_entries.async_forward_entry_setups(config_entry, PLATFORMS)
     await async_setup_services(hass, config_entry)
-    await async_setup_endpoints(hass, config_entry.data)
+    await async_setup_endpoints(hass, config_entry)
 
     return True
 

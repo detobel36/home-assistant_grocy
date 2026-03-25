@@ -406,13 +406,15 @@ async def test_async_setup_endpoint_registers_view(hass) -> None:
         CONF_API_KEY: "test-key",
         CONF_PORT: 9192,
     }
+    mock_config_entry = MagicMock()
+    mock_config_entry.data = config_data
     hass.http = MagicMock()
 
     with patch(
         "custom_components.grocy.grocy_data.async_get_clientsession"
     ) as mock_session:
         mock_session.return_value = MagicMock()
-        await async_setup_endpoints(hass, config_data)
+        await async_setup_endpoints(hass, mock_config_entry)
 
     assert hass.http.register_view.call_count == 2
     views = [call[0][0] for call in hass.http.register_view.call_args_list]
@@ -430,13 +432,15 @@ async def test_async_setup_endpoint_with_path(hass) -> None:
         CONF_API_KEY: "test-key",
         CONF_PORT: 443,
     }
+    mock_config_entry = MagicMock()
+    mock_config_entry.data = config_data
     hass.http = MagicMock()
 
     with patch(
         "custom_components.grocy.grocy_data.async_get_clientsession"
     ) as mock_session:
         mock_session.return_value = MagicMock()
-        await async_setup_endpoints(hass, config_data)
+        await async_setup_endpoints(hass, mock_config_entry)
 
     views = [call[0][0] for call in hass.http.register_view.call_args_list]
     for view in views:

@@ -6,6 +6,7 @@ import logging
 from datetime import datetime, timedelta
 
 from aiohttp import hdrs, web
+from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.http import HomeAssistantView
@@ -219,10 +220,11 @@ class GrocyData:
         return await self.hass.async_add_executor_job(wrapper)
 
 
-async def async_setup_endpoints(hass: HomeAssistant, config_data: dict):
+async def async_setup_endpoints(hass: HomeAssistant, config_entry: ConfigEntry):
     """Do setup and register the apis for grocy with HA."""
     session = async_get_clientsession(hass)
 
+    config_data = config_entry.data
     url = config_data.get(CONF_URL) or ""
     (grocy_base_url, grocy_path) = extract_base_url_and_path(url)
     api_key = config_data.get(CONF_API_KEY)
