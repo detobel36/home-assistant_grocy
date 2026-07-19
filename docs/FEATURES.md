@@ -36,6 +36,7 @@ Requires Grocy feature flag: `FEATURE_FLAG_STOCK`
 | Entity ID | State | Attributes | Icon |
 |-----------|-------|------------|------|
 | `sensor.grocy_stock` | Number of products in stock | `count`, `products` (list) | mdi:fridge-outline |
+| `sensor.grocy_products` | Number of defined products | `count`, `products` (list) | mdi:food-apple-outline |
 
 #### Binary Sensors
 
@@ -123,6 +124,9 @@ Open a product in stock (e.g., open a package).
 | tests/test_grocy_data.py | `test_async_update_expired_products` | Expired products data fetching works |
 | tests/test_grocy_data.py | `test_async_update_overdue_products` | Overdue products data fetching works |
 | tests/test_grocy_data.py | `test_async_update_missing_products` | Missing products data fetching works |
+| tests/test_sensor_products.py | `test_async_update_products_maps_names` | Verify products are fetched and quantity names/locations names are mapped correctly |
+| tests/test_sensor_products.py | `test_products_sensor_native_value_and_attributes` | Verify products sensor native value and extra state attributes |
+| tests/test_sensor_products.py | `test_products_sensor_none_data` | Verify products sensor handles None data gracefully |
 
 ---
 

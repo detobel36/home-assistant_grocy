@@ -93,6 +93,8 @@ class MealPlanItemWrapper:
 
 def model_to_dict(model: Any) -> dict[str, Any]:
     """Convert Grocy model objects into serializable dictionaries."""
+    if isinstance(model, dict):
+        return model
     if hasattr(model, "as_dict"):
         return model.as_dict()
     if hasattr(model, "model_dump"):
