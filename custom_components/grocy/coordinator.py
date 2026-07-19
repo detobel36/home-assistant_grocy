@@ -43,6 +43,7 @@ class GrocyCoordinatorData:
     overdue_products: list[Product] | None = None
     overdue_tasks: list[Task] | None = None
     recipes: list[RecipeWrapper] | None = None
+    products: list[dict] | None = None
     shopping_list: list[ShoppingListProduct] | None = None
     stock: list[Product] | None = None
     tasks: list[Task] | None = None

@@ -21,6 +21,7 @@ from .const import (
     ATTR_CHORES,
     ATTR_MEAL_PLAN,
     ATTR_RECIPES,
+    ATTR_PRODUCTS,
     ATTR_SHOPPING_LIST,
     ATTR_STOCK,
     ATTR_TASKS,
@@ -152,6 +153,18 @@ SENSORS: tuple[GrocySensorEntityDescription, ...] = (
         exists_fn=lambda entities: ATTR_RECIPES in entities,
         attributes_fn=lambda data: {
             "recipes": [model_to_dict(x) for x in data],
+            "count": len(data),
+        },
+    ),
+    GrocySensorEntityDescription(
+        key=ATTR_PRODUCTS,
+        name="Grocy products",
+        native_unit_of_measurement=PRODUCTS,
+        state_class=SensorStateClass.MEASUREMENT,
+        icon="mdi:food-apple-outline",
+        exists_fn=lambda entities: ATTR_PRODUCTS in entities,
+        attributes_fn=lambda data: {
+            "products": [model_to_dict(x) for x in data],
             "count": len(data),
         },
     ),

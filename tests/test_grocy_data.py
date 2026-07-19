@@ -25,6 +25,7 @@ from custom_components.grocy.const import (
     ATTR_OVERDUE_CHORES,
     ATTR_OVERDUE_PRODUCTS,
     ATTR_OVERDUE_TASKS,
+    ATTR_PRODUCTS,
     ATTR_SHOPPING_LIST,
     ATTR_STOCK,
     ATTR_TASKS,
@@ -621,5 +622,6 @@ def test_all_entity_keys_have_update_methods(hass, mock_grocy) -> None:
         ATTR_BATTERIES,
         ATTR_OVERDUE_BATTERIES,
         ATTR_RECIPES,
+        ATTR_PRODUCTS,
     }
     assert set(data.entity_update_method.keys()) == expected_keys

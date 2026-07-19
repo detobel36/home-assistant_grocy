@@ -58,6 +58,11 @@ features:
           - test_async_get_config_stores_due_soon_days_from_dict_payload
           - test_async_get_config_due_soon_days_defaults_to_none
           - test_async_get_config_due_soon_days_handles_invalid_value
+      - file: tests/test_sensor_products.py
+        functions:
+          - test_async_update_products_maps_names
+          - test_products_sensor_native_value_and_attributes
+          - test_products_sensor_none_data
 
   shopping_list:
     name: Shopping List

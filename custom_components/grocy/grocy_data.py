@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+import contextlib
 import logging
 from datetime import datetime, timedelta
+from typing import Any
 
 from aiohttp import hdrs, web
 from homeassistant.config_entries import ConfigEntry
@@ -30,6 +32,7 @@ from .const import (
     ATTR_OVERDUE_PRODUCTS,
     ATTR_OVERDUE_TASKS,
     ATTR_RECIPES,
+    ATTR_PRODUCTS,
     ATTR_SHOPPING_LIST,
     ATTR_STOCK,
     ATTR_TASKS,
@@ -65,6 +68,7 @@ class GrocyData:
             ATTR_BATTERIES: self.async_update_batteries,
             ATTR_OVERDUE_BATTERIES: self.async_update_overdue_batteries,
             ATTR_RECIPES: self.async_update_recipes,
+            ATTR_PRODUCTS: self.async_update_products,
         }
         self._grocy_url = grocy_url
 
@@ -278,6 +282,61 @@ class GrocyData:
             return wrapped_recipes
 
         return await self.hass.async_add_executor_job(wrapper)
+
+    async def async_update_products(self) -> list[dict]:
+        """Update products data."""
+
+        def wrapper():
+            products = self.api.generic.list(EntityType.PRODUCTS) or []
+            quantity_units = self.api.generic.list(EntityType.QUANTITY_UNITS) or []
+            locations = self.api.generic.list(EntityType.LOCATIONS) or []
+            shopping_locations = (
+                self.api.generic.list(EntityType.SHOPPING_LOCATIONS) or []
+            )
+
+            qu_map = _build_id_name_map(quantity_units)
+            loc_map = _build_id_name_map(locations)
+            shop_loc_map = _build_id_name_map(shopping_locations)
+
+            for product in products:
+                for qu_key in (
+                    "qu_id_purchase",
+                    "qu_id_stock",
+                    "qu_id_consume",
+                    "qu_id_price",
+                ):
+                    val = product.get(qu_key)
+                    product[f"{qu_key}_name"] = (
+                        qu_map.get(val) if val is not None else None
+                    )
+
+                loc_id = product.get("location_id")
+                product["location_name"] = (
+                    loc_map.get(loc_id) if loc_id is not None else None
+                )
+
+                shop_loc_id = product.get("shopping_location_id")
+                product["shopping_location_name"] = (
+                    shop_loc_map.get(shop_loc_id) if shop_loc_id is not None else None
+                )
+
+            return products
+
+        return await self.hass.async_add_executor_job(wrapper)
+
+
+def _build_id_name_map(entities: list[dict]) -> dict[Any, str]:
+    """Build a map of id -> name from list of entities, handling string/int keys."""
+    res_map = {}
+    for entity in entities:
+        if "id" in entity and "name" in entity:
+            ent_id = entity["id"]
+            name = entity["name"]
+            res_map[ent_id] = name
+            res_map[str(ent_id)] = name
+            with contextlib.suppress(ValueError, TypeError):
+                res_map[int(ent_id)] = name
+    return res_map
 
 
 async def async_setup_endpoint_for_image_proxy(
